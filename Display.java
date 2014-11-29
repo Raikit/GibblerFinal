@@ -79,7 +79,7 @@ public class Display {
                             }
                             
                             System.out.println("");
-                        }else{
+                        }else {
                             System.out.println("No posts to display from group " + rs1.getString("Groups") + "\n");
                         }//if posts in group
                     }//while groups in rs1
