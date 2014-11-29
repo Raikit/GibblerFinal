@@ -75,6 +75,10 @@ public class Subscribe {
                     //System.out.println(sql);
                     result = statement.executeUpdate(sql);
                     
+                    statement = conn.createStatement();
+                    sql = ("INSERT INTO " + Group + "_group (users, admin) VALUES ('" + current.getUN() + "', 'no');");
+                    result = statement.executeUpdate(sql);
+                    
                     System.out.println("Successfully subscribed to Group " + Group + ". Returning to main menu.");
                 }catch (SQLException ex) {
                     // handle any SQL errors
