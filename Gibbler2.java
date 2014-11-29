@@ -58,27 +58,62 @@ public class Gibbler2 {
         
         guest.viewFeed(null);
         
-        System.out.println("Welcome to Gibbler! How can we assist you?\nPlease enter the number of the option you would like."
-                + "\n\n1. Register an Account\n2. Register an Admin Account\n3. Login\n4. Search\n5. View Feed");
-        ans = in.nextLine();
-        
-        if (ans.equals("1")){
-            gibbler.Register();
-        }
-        
-        else if (ans.equals("2")){
-            gibbler.RegisterAsAdmin();
-        }
-        
-        else if (ans.equals("3")){
-            
-            current = gibbler.LogIn();
-            user.viewFeed(current.getUN());
-            
-            if (current.getUN() != null){
-                loggedIn = true;
+        while (!loggedIn){
+            System.out.println("Welcome to Gibbler! How can we assist you?\nPlease enter the number of the option you would like."
+                    + "\n\n1. Register an Account\n2. Register an Admin Account\n3. Login\n4. Search\n5. View Feed");
+            ans = in.nextLine();
+
+            if (ans.equals("1")){
+                gibbler.Register();
+            }
+
+            else if (ans.equals("2")){
+                gibbler.RegisterAsAdmin();
+            }
+
+            else if (ans.equals("3")){
+
+                current = gibbler.LogIn();
+                user.viewFeed(current.getUN());
+
+                if (current.getUN() != null){
+                    loggedIn = true;
+                }
+
             }
             
+            else if (ans.equals("4")){
+                System.out.println("What would you like to search by?"
+                        + "1. User\n"
+                        + "2. Group\n"
+                        + "3. Hashtag\n");
+                ans = in.nextLine();
+                
+                if (ans.equals("1")){
+                    System.out.println("Which user would you like to search for?");
+                    ans = in.nextLine();
+                    
+                    find.SearchByUser(ans, false);
+                }
+                else if (ans.equals("2")){
+                    System.out.println("Which group would you like to search for?");
+                    ans = in.nextLine();
+                    
+                    find.SearchByGroup(ans, false);                    
+                }
+                else if (ans.equals("3")){
+                    System.out.println("What tag would you like to search for?");
+                    ans = in.nextLine();
+                    
+                    find.SearchByHash(ans);
+                }
+                else {
+                    System.out.println("That option is invalid. Returning to main menu.\n");
+                }
+            }
+            else if(ans.equals("5")){
+                guest.viewFeed(null);
+            } 
         }
         
         while (loggedIn){
@@ -686,30 +721,38 @@ public class Gibbler2 {
             //Check if the desired username is taken
             statement = conn.createStatement();
             sql = ("SELECT name FROM groups WHERE name = '" 
-                    + groupName +"';");
+                    + groupName +"_group';");
             ResultSet rs1 = statement.executeQuery(sql);
             alreadyExists = rs1.next();
 
             if (!alreadyExists) {
 
                 statement = conn.createStatement();
-                sql = ("INSERT INTO groups (name) VALUES ('" + groupName + "');");
+                sql = ("INSERT INTO groups (name) VALUES ('" + groupName.toLowerCase() + "_group');");
                 result = statement.executeUpdate(sql);
 
                 statement = conn.createStatement();
-                sql = ("CREATE TABLE 'mydb'.'" + groupName + "' (\n" +
-                "  'users' VARCHAR(45) NULL), 'admin' VARCHAR(5) NULL;");
+                sql = ("CREATE TABLE `mydb`.`" + groupName + "_group` (\n" +
+                    "  `users` VARCHAR(45) NULL,\n" +
+                    "  `admin` VARCHAR(5) NULL);");
+                /*CREATE TABLE `mydb`.`umbreon` (
+                  `users` VARCHAR(45) NULL,
+                  `admin` VARCHAR(5) NULL);*/
                 result = statement.executeUpdate(sql);
 
                 System.out.println("Group " + groupName + " created successfully.");
 
                 statement = conn.createStatement();
-                sql = ("INSERT INTO " + groupName + "(users, admin) VALUES"
+                sql = ("INSERT INTO " + groupName + "_group (users, admin) VALUES"
                         + " ('" + current.getUN() + "', 'yes');");
                 result = statement.executeUpdate(sql);
+                
+                statement = conn.createStatement();
+                sql = ("INSERT INTO " + current.getUN() + " (Groups) VALUES ('" + groupName + "');");
 
-                System.out.println("User " + current.getUN() + "added to "
+                System.out.println("User " + current.getUN() + " added to group "
                     + groupName + " as admin.");
+                System.out.println(groupName + "added to your followed groups.");
 
             }else{
                 System.out.println("Error: There is already a group with that name.");
@@ -747,25 +790,19 @@ public class Gibbler2 {
                 
                 statement = conn.createStatement();
                 sql = ("SELECT name FROM groups WHERE name = '" 
-                        + group +"';");
+                        + group +"_group';");
                 ResultSet rs1 = statement.executeQuery(sql);
                 
                 if(rs1.isBeforeFirst()){
                     rs1.next();
                     
-                    System.out.println("Is " + rs1.getString("name") + "the group you would like to delete? (Yes/No)");
+                    System.out.println("Are you sure you want to delete the group " + group + "? (Yes/No)");
                     ans = in.nextLine();
                     
-                    while((ans.equals("No") || ans.equals("no")) && rs1.next()){
-                        System.out.println("Is " + rs1.getString("name") + "the group you would like to delete? (Yes/No)");
-                        ans = in.nextLine();
-                    }//while does not want to delete and more groups in list
-                    
                     if(ans.equals("yes") || ans.equals("Yes")){
-                        group = rs1.getString("name");
                         
                         statement = conn.createStatement();
-                        sql = ("SELECT admin FROM " + group + " WHERE user = '" 
+                        sql = ("SELECT admin FROM " + group + "_group WHERE user = '" 
                                 + current.getUN() +"';");
                         ResultSet rs2 = statement.executeQuery(sql);
                         
@@ -773,11 +810,11 @@ public class Gibbler2 {
                         
                         if((rs2.getString("admin").equals("yes")) || (current.getID() < 1000)){
                             statement = conn.createStatement();
-                            sql = ("DROP TABLE " + group + ";");
+                            sql = ("DROP TABLE " + group + "_group;");
                             result = statement.executeUpdate(sql);
                             
                             statement = conn.createStatement();
-                            sql = ("DELETE FROM groups WHERE name='" + group + "';");
+                            sql = ("DELETE FROM groups WHERE name='" + group + "_group';");
                             result = statement.executeUpdate(sql);
                             
                             System.out.println("\nGroup successfully deleted. "
@@ -789,6 +826,9 @@ public class Gibbler2 {
                                     + "\nReturning to main menu.\n");
                         }//if admin
                     }//if wants to delete group
+                    else{
+                        System.out.println("\nGroup not deleted. Returning to main menu.");
+                    }
                     
                 }else{
                     System.out.println("Error: No group esists with that name. Returning to main menu.");
