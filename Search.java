@@ -9,7 +9,7 @@ import java.sql.*;
  */
 /**
  *
- * @author Kira
+ * @author Aisha, Flannery, Kira
  */
 public class Search {
     
@@ -116,7 +116,7 @@ public class Search {
             //Check if the desired username is taken
             statement = conn.createStatement();
             sql = ("SELECT name FROM groups WHERE name = '" 
-                    + group +"';");
+                    + group +"_group';");
             ResultSet rs1 = statement.executeQuery(sql);
             exists = rs1.next();
         
