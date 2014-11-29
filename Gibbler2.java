@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 
 /**
  *
- * @author Aisha
+ * @author Aisha, Flannery, Kira
  */
 
 import java.util.Scanner;
