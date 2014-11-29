@@ -10,6 +10,7 @@ SETTING UP YOUR DB
 Table set-ups are as follows:
 
 Tables that should be created before first run -
+
   users
   
     Columns: usernames (VARCHAR(45)), userids(INT), password(VARCHAR(45)), firstName(VARCHAR(45)), lastName(VARCHAR(45))
